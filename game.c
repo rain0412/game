@@ -208,7 +208,7 @@ int main(void)
 
         }
 	time++;
-	if(time > 0)
+	if(time > 10)
 	{
 		draw_map();
 		time = 0;
@@ -248,9 +248,11 @@ int is_move_okay(int y, int x)
 
          || ((testch & A_CHARTEXT) == PLAYER)
 
+	 || ((testch & A_CHARTEXT) == WATER && (getch() == 's'))
+
          || ((testch & A_CHARTEXT) == MOUNTAIN && (getch() == 'x'))
 
-         || ((testch & A_CHARTEXT) == TREE));
+         || ((testch & A_CHARTEXT) == TREE && (getch() == 't')));
 
 }
 
