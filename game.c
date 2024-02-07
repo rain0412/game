@@ -216,7 +216,7 @@ int main(void)
 
     }
 
-    while ((ch != 'q') && (ch != 'Q') || (x != 0) && (y != 0));
+    while ((ch != 'q') && (ch != 'Q') || (x != 0) || (y != 0));
 
     mvprintw(0, 0, "                                                                                        quit                                                         ");
 
