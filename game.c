@@ -1,162 +1,100 @@
 #include <curses.h>
-
 #include <stdlib.h>
-
 #include <time.h>
 
 #define GRASS      ' '
-
 #define WATER      '~'
-
 #define MOUNTAIN   'A'
-
 #define PLAYER     '#'
-
 #define TREE       'Y'
-
 #define BLACKGRASS 'I'
-
 #define BRIGE      '-'
-
 #define DIMOND     'V'
-
 #define GRASS_PAIR      1
-
 #define EMPTY_PAIR      1
-
 #define WATER_PAIR      2
-
 #define MOUNTAIN_PAIR   3
-
 #define PLAYER_PAIR     4
-
 #define TREE_PAIR       8
-
 #define BLACKGRASS_PAIR 10
-
 #define BRIGE_PAIR      5
-
 #define DIMOND_PAIR     6
 
 int is_move_okay(int y, int x);
-
 void draw_map(void);
 
 int main(void)
-
 {
 
     int y, x, time;
-
     int ch;
 
     /* 初始化curses */
-
     initscr();
-
     keypad(stdscr, TRUE);
-
     cbreak();
-
     noecho();
-
     curs_set(0); //把光标置为不可见
 
     /* 初始化颜色 */
-
     if (has_colors() == FALSE) {
-
         endwin();
-
         printf("Your terminal does not support color\n");
-
         exit(1);
-
     }
 
     start_color();
-
     init_pair(GRASS_PAIR, COLOR_YELLOW, COLOR_GREEN);
-
     init_pair(WATER_PAIR, COLOR_CYAN, COLOR_BLUE);
-
     init_pair(MOUNTAIN_PAIR, COLOR_BLACK, COLOR_WHITE);
-
     init_pair(PLAYER_PAIR, COLOR_RED, COLOR_BLACK);
-
     init_pair(TREE_PAIR, COLOR_BLACK, COLOR_GREEN);
-
     init_pair(BLACKGRASS_PAIR, COLOR_BLACK, COLOR_BLUE);
-
     init_pair(BRIGE_PAIR, COLOR_GREEN, COLOR_BLACK);
-
     init_pair(DIMOND_PAIR, COLOR_BLUE, COLOR_WHITE);
-
     clear();
 
     /* 初始化探索地图 */
-
     draw_map();
-
-
     mvprintw(0, 0, "                                                                      Welcome!                                                                                         ");
 
     /* 在左下角创建新角色 */
-
     y = 2;
-
     x = 50;
-
     do {
-
         /* 默认情况下你获得了一个闪烁的光标--用来指明玩家 * */
-
         attron(COLOR_PAIR(PLAYER_PAIR));
-
         mvaddch(y, x, PLAYER);
-
         attroff(COLOR_PAIR(PLAYER_PAIR));
-
         //move(y, x);
-
         refresh();
-
         ch = getch();
 
-        /* 测试输入键值并获取方向 */
-
+		/* 测试输入键值并获取方向 */
         switch (ch) {
 
-        case KEY_UP:
+			case KEY_UP:
+        	case 'w':
+	        case 'W':
+	            if ((y > 0) && is_move_okay(y - 1, x)) {
+					attron(COLOR_PAIR(GRASS_PAIR));
+					mvaddch(y, x, GRASS);
+					attroff(COLOR_PAIR(GRASS_PAIR));
+            	    y = y - 1;
+            	}
 
-        case 'w':
-
-        case 'W':
-
-            if ((y > 0) && is_move_okay(y - 1, x)) {
-
-		attron(COLOR_PAIR(GRASS_PAIR));
-
-		mvaddch(y, x, GRASS);
-
-		attroff(COLOR_PAIR(GRASS_PAIR));
-
-                y = y - 1;
-
-            }
-
-            break;
-
-        case KEY_DOWN:
-
-        case 's':
-
-        case 'S':
-
-            if ((y < LINES - 1) && is_move_okay(y + 1, x)) {
-
-		attron(COLOR_PAIR(GRASS_PAIR));
-
+            	break;
+	
+	        case KEY_DOWN:
+	
+	        case 's':
+	
+	        case 'S':
+	
+	            if ((y < LINES - 1) && is_move_okay(y + 1, x)) {
+	
+			attron(COLOR_PAIR(GRASS_PAIR));
+	
 		mvaddch(y, x, GRASS);
 
 		attroff(COLOR_PAIR(GRASS_PAIR));
