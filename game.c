@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #define GRASS      ' '
 #define WATER      '~'
@@ -82,68 +83,40 @@ int main(void)
 					attroff(COLOR_PAIR(GRASS_PAIR));
             	    y = y - 1;
             	}
-
-            	break;
+                break;
 	
 	        case KEY_DOWN:
-	
 	        case 's':
-	
 	        case 'S':
-	
 	            if ((y < LINES - 1) && is_move_okay(y + 1, x)) {
-	
-			attron(COLOR_PAIR(GRASS_PAIR));
-	
-		mvaddch(y, x, GRASS);
+    		    	attron(COLOR_PAIR(GRASS_PAIR));
+            		mvaddch(y, x, GRASS);
+            		attroff(COLOR_PAIR(GRASS_PAIR));
+                    y = y + 1;
+                }
+                break;
 
-		attroff(COLOR_PAIR(GRASS_PAIR));
+            case KEY_LEFT:
+            case 'a':
+            case 'A':
+                if ((x > 0) && is_move_okay(y, x - 1)) {
+                    attron(COLOR_PAIR(GRASS_PAIR));
+                    mvaddch(y, x, GRASS);
+                    attroff(COLOR_PAIR(GRASS_PAIR));
+                    x = x - 1;
+                }
+                break;
 
-                y = y + 1;
-
-            }
-
-            break;
-
-        case KEY_LEFT:
-
-        case 'a':
-
-        case 'A':
-
-            if ((x > 0) && is_move_okay(y, x - 1)) {
-
-		attron(COLOR_PAIR(GRASS_PAIR));
-
-		mvaddch(y, x, GRASS);
-
-		attroff(COLOR_PAIR(GRASS_PAIR));
-
-                x = x - 1;
-
-            }
-
-            break;
-
-        case KEY_RIGHT:
-
-        case 'd':
-
-        case 'D':
-
-            if ((x < COLS - 1) && is_move_okay(y, x + 1)) {
-
-		attron(COLOR_PAIR(GRASS_PAIR));
-
-		mvaddch(y, x, GRASS);
-
-		attroff(COLOR_PAIR(GRASS_PAIR));
-
-                x = x + 1;
-            }
-
-            break;
-
+            case KEY_RIGHT:
+            case 'd':
+            case 'D':
+                if ((x < COLS - 1) && is_move_okay(y, x + 1)) {
+                    attron(COLOR_PAIR(GRASS_PAIR));
+                    mvaddch(y, x, GRASS);
+                    attroff(COLOR_PAIR(GRASS_PAIR));
+                    x = x + 1;
+                }
+                break;
         }
 	time++;
 	if(time > 10)
@@ -152,144 +125,91 @@ int main(void)
 		time = 0;
 	}
 
-    }
-
-    while ((ch != 'q') && (ch != 'Q') || (x != 0) || (y != 0));
+    }while ((ch != 'q') && (ch != 'Q') || (x != 0) || (y != 0));
 
     mvprintw(0, 0, "                                                                                        quit                                                         ");
-
     refresh();
-
     sleep(1);
-
     endwin();
-
     exit(0);
 
 }
 
 int is_move_okay(int y, int x)
-
 {
-
     int testch;
 
     /* 当空白处可以进入的时候返回true */
-
     testch = mvinch(y, x);
-
     return (((testch & A_CHARTEXT) == GRASS)
-
-	 || ((testch & A_CHARTEXT) == BLACKGRASS)
-
+    	 || ((testch & A_CHARTEXT) == BLACKGRASS)
          || ((testch & A_CHARTEXT) == BRIGE)
-
          || ((testch & A_CHARTEXT) == PLAYER)
-
-	 || ((testch & A_CHARTEXT) == WATER && (getch() == 's'))
-
+         || ((testch & A_CHARTEXT) == WATER && (getch() == 's'))
          || ((testch & A_CHARTEXT) == MOUNTAIN && (getch() == 'x'))
-
          || ((testch & A_CHARTEXT) == TREE && (getch() == 't')));
 
 }
 
 void draw_map(void)
-
 {
 
     int y, x;
 
     /* 绘制探索地图 */
-
     /* 背景 */
-
     attron(COLOR_PAIR(GRASS_PAIR));
-
     for (y = 0; y < LINES; y++) {
-
         mvhline(y, 0, GRASS, COLS);
-
     }
-
     attroff(COLOR_PAIR(GRASS_PAIR));
 
     /* 山峰和山路 */
-
     attron(COLOR_PAIR(MOUNTAIN_PAIR));
-
     for (x = COLS / 2; x < COLS * 3 / 4; x++) {
-
         mvvline(0, x + 7, MOUNTAIN, LINES);
-
     }
-
     attroff(COLOR_PAIR(MOUNTAIN_PAIR));
 
     attron(COLOR_PAIR(GRASS_PAIR));
-
     mvhline(LINES / 4, 0, GRASS, COLS);
-
     attroff(COLOR_PAIR(GRASS_PAIR));
 
     /* 湖和桥 */
-
     attron(COLOR_PAIR(WATER_PAIR));
-
     for (y = 1; y < LINES / 5; y++) {
-
         mvhline(y + 10, 1, WATER, COLS / 3);
-
     }
-    
     attroff(COLOR_PAIR(WATER_PAIR));
 
     attron(COLOR_PAIR(BRIGE_PAIR));
-
     mvvline(11, 14, BRIGE, LINES / 5 - 1);
-
     attroff(COLOR_PAIR(BRIGE_PAIR));
 
-
     /* 水稻 */
-    
     attron(COLOR_PAIR(BLACKGRASS_PAIR));
-
     for(y = 1; y < 8; y++){
-
 	    mvhline(y, 14, BLACKGRASS, COLS / 3);    
-    
     }
-
     attroff(COLOR_PAIR(BLACKGRASS_PAIR));
 
     /* 树 */
 
     attron(COLOR_PAIR(TREE_PAIR));
-
     for(y = 0; y < COLS / 3; y++){
 	   mvhline(y / 10, 5, TREE, COLS / 7);
     }
-
     mvvline(0, 40, TREE, 10);
-
     mvvline(0, 80, TREE, 11);
-
     mvhline(10, 40, TREE, 40);
-
     attroff(COLOR_PAIR(TREE_PAIR));
   
     /* 钻石 */
 
     attron(COLOR_PAIR(DIMOND_PAIR));
-
     srand((unsigned)time(NULL));
-
     for(y = 0; y < 3; y++){
            mvhline(y + 20, COLS / 2 + 25, DIMOND, 3);
     }
-
     attroff(COLOR_PAIR(DIMOND_PAIR));
-
-
 }
